@@ -5,7 +5,9 @@ public class Hexadecimal {
     public static final String PREFIX = '0x';
     static final String HEX_CAHRACTERS = '0123456789abcdef';
     static final String HEX_FORMAT_REGEX = '(0x|)[0-9a-f]+';
+    @TestVisible
     static final String MSG_INVALID_FORMAT = '有効な16進数の形式ではありません。';
+    @TestVisible
     static final String MSG_INTEGER_IS_NULL = '10進数の整数値がnullです。';
 
     String value;
@@ -25,6 +27,7 @@ public class Hexadecimal {
      *
      * @param intValue 10進数の整数値
      * @return インスタンス
+     * @exception IllegalArgumentException 10進数の整数値がnullの場合
      */
     public static Hexadecimal valueOf(Integer intValue) {
         if (intValue == null)
@@ -38,6 +41,7 @@ public class Hexadecimal {
             hex = hexChar + hex;
             intValue = intValue / 16;
         }
+
         return new Hexadecimal(hex);
     }
 

@@ -2,12 +2,6 @@
  * UUID
  */
 public abstract class Uuid {
-    static final String MSG_VARIANT_IS_NULL = 'バリアントがnullです。';
-    static final String MSG_VARIANT_IS_UNSUPPORTED = 'このバリアント ({0}) のインスタンス生成はサポートされていません。';
-    static final String MSG_UUID_IS_INVALID = 'UUIDの値が無効な形式です。';
-
-    String value;
-
     /**
      * UUIDのバリアント
      * - RFC4122_V4: RFC4122規格のバージョン4
@@ -16,10 +10,18 @@ public abstract class Uuid {
         RFC4122_V4
     }
 
+    static final String MSG_VARIANT_IS_NULL = 'バリアントがnullです。';
+    @TestVisible
+    static final String MSG_VARIANT_IS_UNSUPPORTED = 'このバリアント ({0}) のインスタンス生成はサポートされていません。';
+    @TestVisible
+    static final String MSG_UUID_IS_INVALID = 'UUIDの値が無効な形式です。';
     // バリアント及びバージョンとコンストラクタクラスの対応付け
+    @TestVisible
     static final Map<Variant, Type> CONSTRUCTOR_CLASS_BY_VARIANT = new Map<Variant, Type>{
         Variant.RFC4122_V4 => UuidRfc4122V4.Constructor.class
     };
+
+    String value;
 
     /**
      * コンストラクタ
@@ -68,36 +70,16 @@ public abstract class Uuid {
      * UUIDのコンストラクタを取得する
      *
      * @param variant UUIDのバリアント
-     * @return UUIDのコンストラクタ
-     * @exception IllegalArgumentException 以下のいずれかの場合
-     * - バリアントがnull
-     * - バリアントに対応するインスタンス生成がサポートされていない
+     * @return UUIDのコンストラクタ。モックが設定されている場合、モックを返却
+     * @exception IllegalArgumentException バリアントに対応するインスタンス生成がサポートされていない場合
      */
     private static IConstructor getConstructor(Variant variant) {
-        if (variant == null)
-            throw new IllegalArgumentException(MSG_VARIANT_IS_NULL);
-
         Type constructorClass = CONSTRUCTOR_CLASS_BY_VARIANT.get(variant);
         if (constructorClass == null)
-            throw new IllegalArgumentException(String.format(MSG_VARIANT_IS_UNSUPPORTED, new List<String>{ variant.name() }));
+            throw new IllegalArgumentException(String.format(MSG_VARIANT_IS_UNSUPPORTED, new List<String>{ variant?.name() }));
 
         return (IConstructor) constructorClass.newInstance();
     }
-
-    /**
-     * UUIDを生成する
-     *
-     * @return 生成されたUUID
-     */
-    abstract String generateUuid();
-
-    /**
-     * UUIDが有効な形式であることを検証する
-     *
-     * @param uuidString UUID
-     * @return 有効である場合はtrue、それ以外の場合はfalse
-     */
-    abstract Boolean isValid(String uuidString);
 
     /**
      * UUIDの文字列を取得する
@@ -107,6 +89,21 @@ public abstract class Uuid {
     public String stringValue() {
         return this.value;
     }
+
+    /**
+     * UUIDを生成する
+     *
+     * @return 生成されたUUID
+     */
+    private abstract String generateUuid();
+
+    /**
+     * UUIDが有効な形式であることを検証する
+     *
+     * @param uuidString UUID
+     * @return 有効である場合はtrue、それ以外の場合はfalse
+     */
+    private abstract Boolean isValid(String uuidString);
 
     /**
      * UUIDコンストラクタ
