@@ -46,7 +46,7 @@ private class UuidTest {
     static void newInstance_When_VariantIsSupported_Expect_ReturnUuid() {
         // 準備
         Uuid.CONSTRUCTOR_CLASS_BY_VARIANT.clear();
-        Uuid.CONSTRUCTOR_CLASS_BY_VARIANT.put(null, UuidMockConstructor.class);
+        Uuid.CONSTRUCTOR_CLASS_BY_VARIANT.put(null, UuidMock.Constructor.class);
         Uuid.Variant variant = null;
 
         // 実行
@@ -75,7 +75,7 @@ private class UuidTest {
     static void newInstance_When_CallWithUuidString_Expect_ReturnUuidHasUuidString() {
         // 準備
         Uuid.CONSTRUCTOR_CLASS_BY_VARIANT.clear();
-        Uuid.CONSTRUCTOR_CLASS_BY_VARIANT.put(null, UuidMockConstructor.class);
+        Uuid.CONSTRUCTOR_CLASS_BY_VARIANT.put(null, UuidMock.Constructor.class);
         Uuid.Variant variant = null;
         String uuidString = 'test';
 

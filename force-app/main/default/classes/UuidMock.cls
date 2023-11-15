@@ -1,3 +1,6 @@
+/**
+ * UUIDモック
+ */
 @IsTest
 public class UuidMock extends Uuid {
     public static String generatedUuid = 'uuid';
@@ -17,5 +20,15 @@ public class UuidMock extends Uuid {
 
     private Boolean isValid(String uuidString) {
         return isValid;
+    }
+
+    public class Constructor implements Uuid.IConstructor {
+        public Uuid construct() {
+            return new UuidMock();
+        }
+
+        public Uuid construct(String uuidString) {
+            return new UuidMock(uuidString);
+        }
     }
 }
