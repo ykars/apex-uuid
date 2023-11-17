@@ -38,7 +38,7 @@ private class UuidTest {
             Uuid uuid = new UuidMock('This is invalid UUID');
             Assert.fail();
         } catch (IllegalArgumentException e) {
-            Assert.areEqual(Uuid.MSG_UUID_IS_INVALID, e.getMessage());
+            Assert.areEqual('uuidString (This is invalid UUID) が無効な形式です。', e.getMessage());
         }
     }
 
@@ -67,7 +67,7 @@ private class UuidTest {
             Uuid uuid = Uuid.newInstance(variant);
             Assert.fail();
         } catch (IllegalArgumentException e) {
-            Assert.areEqual(String.format(Uuid.MSG_VARIANT_IS_UNSUPPORTED, new List<String>{ variant?.name() }), e.getMessage());
+            Assert.areEqual('variant (' + variant?.name() + ') がサポートされていません。', e.getMessage());
         }
     }
 

@@ -27,21 +27,21 @@ public class UuidRfc4122V4 extends Uuid {
         String randomHexString = EncodingUtil.convertToHex(randomBits);
 
         // バリアントを用意
-        Hexadecimal variantHex = new Hexadecimal(randomHexString.substring(16, 17)); // 16進数の17桁目(バリアントを表す桁)を取得
-        Integer variantInteger = variantHex.toInteger(); // 10進数に変換
+        String variantHex = randomHexString.substring(16, 17); // 16進数の17桁目(バリアントを表す桁)を取得
+        Integer variantInteger = IntegerUtils.fromHexString(variantHex); // 10進数に変換
         variantInteger = variantInteger | 8; // 1ビット目を1にする
         variantInteger = variantInteger & 11; // 2ビット目を0にする
-        variantHex = Hexadecimal.valueOf(variantInteger); // 16進数に変換
+        variantHex = IntegerUtils.toHexString(variantInteger); // 16進数に変換
 
         // バージョンを用意
-        Hexadecimal versionHex = Hexadecimal.valueOf(4);
+        String versionHex = IntegerUtils.toHexString(4);
 
         // UUIDを生成
         String uuidString = String.format('{0}-{1}-{2}-{3}-{4}', new List<String>{
             randomHexString.substring(0, 8),
             randomHexString.substring(8, 12),
-            versionHex.stringValue() + randomHexString.substring(13, 16),
-            variantHex.stringValue() + randomHexString.substring(17, 20),
+            versionHex + randomHexString.substring(13, 16),
+            variantHex + randomHexString.substring(17, 20),
             randomHexString.substring(20, 32)
         });
 

@@ -10,18 +10,13 @@ public abstract class Uuid {
         RFC4122_V4
     }
 
-    static final String MSG_VARIANT_IS_NULL = 'バリアントがnullです。';
-    @TestVisible
-    static final String MSG_VARIANT_IS_UNSUPPORTED = 'このバリアント ({0}) のインスタンス生成はサポートされていません。';
-    @TestVisible
-    static final String MSG_UUID_IS_INVALID = 'UUIDの値が無効な形式です。';
     // バリアント及びバージョンとコンストラクタクラスの対応付け
     @TestVisible
-    static final Map<Variant, Type> CONSTRUCTOR_CLASS_BY_VARIANT = new Map<Variant, Type>{
+    private static final Map<Variant, Type> CONSTRUCTOR_CLASS_BY_VARIANT = new Map<Variant, Type>{
         Variant.RFC4122_V4 => UuidRfc4122V4.Constructor.class
     };
 
-    String value;
+    private String value;
 
     /**
      * コンストラクタ
@@ -38,7 +33,7 @@ public abstract class Uuid {
      */
     protected Uuid(String uuidString) {
         if (!isValid(uuidString))
-            throw new IllegalArgumentException(MSG_UUID_IS_INVALID);
+            throw new IllegalArgumentException('uuidString (' + uuidString + ') が無効な形式です。');
 
         this.value = uuidString;
     }
@@ -71,12 +66,12 @@ public abstract class Uuid {
      *
      * @param variant UUIDのバリアント
      * @return UUIDのコンストラクタ。モックが設定されている場合、モックを返却
-     * @exception IllegalArgumentException バリアントに対応するインスタンス生成がサポートされていない場合
+     * @exception IllegalArgumentException バリアントがサポートされていない場合
      */
     private static IConstructor getConstructor(Variant variant) {
         Type constructorClass = CONSTRUCTOR_CLASS_BY_VARIANT.get(variant);
         if (constructorClass == null)
-            throw new IllegalArgumentException(String.format(MSG_VARIANT_IS_UNSUPPORTED, new List<String>{ variant?.name() }));
+            throw new IllegalArgumentException('variant (' + variant?.name() + ') がサポートされていません。');
 
         return (IConstructor) constructorClass.newInstance();
     }

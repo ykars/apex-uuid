@@ -39,7 +39,7 @@ private class UuidRfc4122V4Test {
             UuidRfc4122V4 uuid = new UuidRfc4122V4(uuidString);
             Assert.fail();
         } catch (IllegalArgumentException e) {
-            Assert.areEqual(Uuid.MSG_UUID_IS_INVALID, e.getMessage());
+            Assert.areEqual('uuidString (' + uuidString + ') が無効な形式です。', e.getMessage());
         }
     }
 
@@ -53,7 +53,7 @@ private class UuidRfc4122V4Test {
             UuidRfc4122V4 uuid = new UuidRfc4122V4(uuidString);
             Assert.fail();
         } catch (IllegalArgumentException e) {
-            Assert.areEqual(Uuid.MSG_UUID_IS_INVALID, e.getMessage());
+            Assert.areEqual('uuidString (' + uuidString + ') が無効な形式です。', e.getMessage());
         }
     }
 
