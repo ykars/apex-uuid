@@ -1,18 +1,78 @@
-# Salesforce DX Project: Next Steps
+# Apex UUID
 
-Now that you’ve created a Salesforce DX project, what’s next? Here are some documentation resources to get you started.
+このリポジトリには、UUID を生成する Apex クラスが含まれています。UUID については [Wikipedia](https://ja.wikipedia.org/wiki/UUID) を参照してください。
 
-## How Do You Plan to Deploy Your Changes?
+## 使用方法
 
-Do you want to deploy a set of changes, or create a self-contained application? Choose a [development model](https://developer.salesforce.com/tools/vscode/en/user-guide/development-models).
+- UUID を生成する **※現在、RFC4122 規格バージョン4のみサポートされています。**
 
-## Configure Your Salesforce DX Project
+    - RFC4122 規格バージョン4
 
-The `sfdx-project.json` file contains useful configuration information for your project. See [Salesforce DX Project Configuration](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_ws_config.htm) in the _Salesforce DX Developer Guide_ for details about this file.
+        ```java
+        Uuid uuid = Uuid.newInstance(Uuid.Variant.RFC4122_V4);
+        ```
 
-## Read All About It
+- 文字列を取得する
 
-- [Salesforce Extensions Documentation](https://developer.salesforce.com/tools/vscode/)
-- [Salesforce CLI Setup Guide](https://developer.salesforce.com/docs/atlas.en-us.sfdx_setup.meta/sfdx_setup/sfdx_setup_intro.htm)
-- [Salesforce DX Developer Guide](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_intro.htm)
-- [Salesforce CLI Command Reference](https://developer.salesforce.com/docs/atlas.en-us.sfdx_cli_reference.meta/sfdx_cli_reference/cli_reference.htm)
+    ```java
+    Uuid uuid = Uuid.newInstance(Uuid.Variant.RFC4122_V4);
+    String uuidString = uuid.stringValue();
+    ```
+
+- 既存の UUID 文字列を使用してインスタンス化する
+
+    ```java
+    String uuidString = '564f6370-b9ea-404a-8c04-b9bc508e8d7d';
+    Uuid uuid = Uuid.newInstance(Uuid.Variant.RFC4122_V4, uuidString);
+    Assert.areEqual(uuidString, uuid.stringValue());
+    ```
+
+## インストール方法
+
+1. リポジトリをクローンする
+
+    ```
+    git clone https://github.com/ykars/apex-uuid.git
+    ```
+
+2. クローンしたリポジトリに移動
+
+    ```
+    cd apex-uuid
+    ```
+
+3. 組織に接続し、インストールする
+
+    - 通常の組織の場合
+
+        1. インストール組織にログイン
+
+            ```
+            sf org login web --alias MyOrg --set-default
+            ```
+
+        2. ソースをデプロイ
+
+            ```
+            sf project deploy start
+            ```
+
+    - スクラッチ組織の場合
+
+        1. Dev Hub 組織にログイン
+
+            ```
+            sf org login web --alias DevHubOrg --set-default-dev-hub
+            ```
+
+        2. スクラッチ組織を作成
+
+            ```
+            sf org create scratch --alias ScratchOrg --set-default --definition-file config\project-scratch-def.json
+            ```
+
+        3. ソースをデプロイ
+
+            ```
+            sf project deploy start
+            ```
