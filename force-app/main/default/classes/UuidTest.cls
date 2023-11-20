@@ -43,31 +43,31 @@ private class UuidTest {
     }
 
     @IsTest
-    static void newInstance_When_VariantIsSupported_Expect_ReturnUuid() {
+    static void newInstance_When_TypeIsSupported_Expect_ReturnUuid() {
         // 準備
         Uuid.CONSTRUCTOR_CLASS_BY_VARIANT.clear();
         Uuid.CONSTRUCTOR_CLASS_BY_VARIANT.put(null, UuidMock.Constructor.class);
-        Uuid.Variant variant = null;
+        Uuid.Type uuidType = null;
 
         // 実行
-        Uuid uuid = Uuid.newInstance(variant);
+        Uuid uuid = Uuid.newInstance(uuidType);
 
         // 検証
         Assert.isInstanceOfType(uuid, UuidMock.class);
     }
 
     @IsTest
-    static void newInstance_When_VariantIsUnsupported_Expect_ThrowException() {
+    static void newInstance_When_TypeIsUnsupported_Expect_ThrowException() {
         // 準備
         Uuid.CONSTRUCTOR_CLASS_BY_VARIANT.clear();
-        Uuid.Variant variant = null;
+        Uuid.Type uuidType = null;
 
         // 実行 & 検証
         try {
-            Uuid uuid = Uuid.newInstance(variant);
+            Uuid uuid = Uuid.newInstance(uuidType);
             Assert.fail();
         } catch (IllegalArgumentException e) {
-            Assert.areEqual('variant (' + variant?.name() + ') がサポートされていません。', e.getMessage());
+            Assert.areEqual('uuidType (' + uuidType?.name() + ') がサポートされていません。', e.getMessage());
         }
     }
 
@@ -76,11 +76,11 @@ private class UuidTest {
         // 準備
         Uuid.CONSTRUCTOR_CLASS_BY_VARIANT.clear();
         Uuid.CONSTRUCTOR_CLASS_BY_VARIANT.put(null, UuidMock.Constructor.class);
-        Uuid.Variant variant = null;
+        Uuid.Type uuidType = null;
         String uuidString = 'test';
 
         // 実行
-        Uuid uuid = Uuid.newInstance(variant, uuidString);
+        Uuid uuid = Uuid.newInstance(uuidType, uuidString);
 
         // 検証
         Assert.areEqual(uuidString, uuid.stringValue());

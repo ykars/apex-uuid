@@ -3,17 +3,17 @@
  */
 public abstract class Uuid {
     /**
-     * UUIDのバリアント
+     * UUID種別
      * - RFC4122_V4: RFC4122規格のバージョン4
      */
-    public enum Variant {
+    public enum Type {
         RFC4122_V4
     }
 
-    // バリアント及びバージョンとコンストラクタクラスの対応付け
+    // UUID種別とコンストラクタクラスの対応付け
     @TestVisible
-    private static final Map<Variant, Type> CONSTRUCTOR_CLASS_BY_VARIANT = new Map<Variant, Type>{
-        Variant.RFC4122_V4 => UuidRfc4122V4.Constructor.class
+    private static final Map<Uuid.Type, System.Type> CONSTRUCTOR_CLASS_BY_VARIANT = new Map<Uuid.Type, System.Type>{
+        Uuid.Type.RFC4122_V4 => UuidRfc4122V4.Constructor.class
     };
 
     private String value;
@@ -41,37 +41,37 @@ public abstract class Uuid {
     /**
      * インスタンスを生成する
      *
-     * @param variant UUIDのバリアント
+     * @param uuidType UUID種別
      * @return インスタンス
      */
-    public static Uuid newInstance(Variant variant) {
-        IConstructor constructor = getConstructor(variant);
+    public static Uuid newInstance(Uuid.Type uuidType) {
+        IConstructor constructor = getConstructor(uuidType);
         return constructor.construct();
     }
 
     /**
      * インスタンスを生成する
      *
-     * @param variant UUIDのバリアント
+     * @param uuidType UUID種別
      * @param uuidString UUIDの文字列
      * @return インスタンス
      */
-    public static Uuid newInstance(Variant variant, String uuidString) {
-        IConstructor constructor = getConstructor(variant);
+    public static Uuid newInstance(Uuid.Type uuidType, String uuidString) {
+        IConstructor constructor = getConstructor(uuidType);
         return constructor.construct(uuidString);
     }
 
     /**
      * UUIDのコンストラクタを取得する
      *
-     * @param variant UUIDのバリアント
+     * @param uuidType UUID種別
      * @return UUIDのコンストラクタ。モックが設定されている場合、モックを返却
-     * @exception IllegalArgumentException バリアントがサポートされていない場合
+     * @exception IllegalArgumentException UUID種別がサポートされていない場合
      */
-    private static IConstructor getConstructor(Variant variant) {
-        Type constructorClass = CONSTRUCTOR_CLASS_BY_VARIANT.get(variant);
+    private static IConstructor getConstructor(Uuid.Type uuidType) {
+        System.Type constructorClass = CONSTRUCTOR_CLASS_BY_VARIANT.get(uuidType);
         if (constructorClass == null)
-            throw new IllegalArgumentException('variant (' + variant?.name() + ') がサポートされていません。');
+            throw new IllegalArgumentException('uuidType (' + uuidType?.name() + ') がサポートされていません。');
 
         return (IConstructor) constructorClass.newInstance();
     }

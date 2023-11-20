@@ -1,9 +1,9 @@
 /**
- * バージョン4バリアント2のUUID
+ * RFC4122規格バージョン4のUUID
  */
 public class UuidRfc4122V4 extends Uuid {
     @TestVisible
-    static final String UUID_FORMAT_REGEX = '[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}';
+    private static final String UUID_FORMAT_REGEX = '[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}';
 
     /**
      * コンストラクタ
