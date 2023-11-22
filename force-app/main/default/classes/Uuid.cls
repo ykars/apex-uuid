@@ -1,122 +1,89 @@
 /**
- * UUID
+ * UUID（Universally Unique Identifier）
  */
-public abstract class Uuid {
+public class Uuid {
     /**
-     * UUID種別
-     * - RFC4122_V4: RFC4122規格のバージョン4
+     * UUIDの文字列表現
      */
-    public enum Type {
-        RFC4122_V4
-    }
-
-    // UUID種別とコンストラクタクラスの対応付け
-    @TestVisible
-    private static final Map<Uuid.Type, System.Type> CONSTRUCTOR_CLASS_BY_VARIANT = new Map<Uuid.Type, System.Type>{
-        Uuid.Type.RFC4122_V4 => UuidRfc4122V4.Constructor.class
-    };
-
-    private String value;
+    private final String uuidString;
 
     /**
      * コンストラクタ
+     * 文字列表現を使用して新しいUUIDを構築する
+     *
+     * @param uuidString UUIDの文字列表現
      */
-    protected Uuid() {
-        this.value = generateUuid();
+    private Uuid(String uuidString) {
+        this.uuidString = uuidString;
     }
 
     /**
-     * コンストラクタ
+     * 文字列表現からUUIDを生成する
      *
-     * @param uuidString UUID
-     * @exception IllegalArgumentException UUIDが無効な形式の場合
+     * @param uuidString UUIDの文字列表現
+     * @return UUID
+     * @exception IllegalArgumentException uuidStringが無効な形式の場合
      */
-    protected Uuid(String uuidString) {
-        if (!isValid(uuidString))
-            throw new IllegalArgumentException('uuidString (' + uuidString + ') が無効な形式です。');
+    public static Uuid fromString(String uuidString) {
+        if (uuidString.length() > 36) {
+            throw new IllegalArgumentException('UUID文字列が長すぎます。上限は36文字です。: ' + uuidString);
+        }
 
-        this.value = uuidString;
+        Integer dash1 = uuidString.indexOf('-', 0);
+        Integer dash2 = uuidString.indexOf('-', dash1 + 1);
+        Integer dash3 = uuidString.indexOf('-', dash2 + 1);
+        Integer dash4 = uuidString.indexOf('-', dash3 + 1);
+        Integer dash5 = uuidString.indexOf('-', dash4 + 1);
+
+        // 有効な入力の場合、dash1 ～ dump4 は正、dash5 は負になるが、dash4 と dump5 を確認すればよい
+        // - dash1 が -1 の場合、dash4 は -1 になる
+        // - dash1 が正で dash2 が -1 の場合、dash4 は -1 になる
+        // - dash1 と dash2 が正の場合、dash3 は -1 になり、dash4 は正になるが、dash5 も正になる
+        if (dash4 < 0 || dash5 >= 0) {
+            throw new IllegalArgumentException('UUID文字列が無効な形式です。: ' + uuidString);
+        }
+
+        return new Uuid(uuidString);
     }
 
     /**
-     * インスタンスを生成する
+     * 乱数に基づくUUID（UUIDバージョン4）を生成する
      *
-     * @param uuidType UUID種別
-     * @return インスタンス
+     * @return UUID
      */
-    public static Uuid newInstance(Uuid.Type uuidType) {
-        IConstructor constructor = getConstructor(uuidType);
-        return constructor.construct();
+    public static Uuid randomUuid() {
+        // ランダムな16進数を用意
+        Blob randomBits = Crypto.generateAesKey(128);
+        String randomHex = EncodingUtil.convertToHex(randomBits);
+
+        // バリアントを用意
+        String variantHex = randomHex.substring(16, 17); // 16進数の17桁目（バリアントを表す桁）を取得
+        Integer variantInt = IntegerUtils.fromHexString(variantHex); // 10進数に変換
+        variantInt = variantInt | 8; // 1ビット目を1にする
+        variantInt = variantInt & 11; // 2ビット目を0にする
+        variantHex = IntegerUtils.toHexString(variantInt); // 16進数に変換
+
+        // バージョンを用意
+        String versionHex = IntegerUtils.toHexString(4);
+
+        // UUIDを生成
+        String uuidString = String.format('{0}-{1}-{2}-{3}-{4}', new List<String>{
+            randomHex.substring(0, 8),
+            randomHex.substring(8, 12),
+            versionHex + randomHex.substring(13, 16),
+            variantHex + randomHex.substring(17, 20),
+            randomHex.substring(20, 32)
+        });
+
+        return new Uuid(uuidString);
     }
 
     /**
-     * インスタンスを生成する
+     * このUUIDの文字列表現を返す
      *
-     * @param uuidType UUID種別
-     * @param uuidString UUIDの文字列
-     * @return インスタンス
+     * @return UUIDの文字列表現
      */
-    public static Uuid newInstance(Uuid.Type uuidType, String uuidString) {
-        IConstructor constructor = getConstructor(uuidType);
-        return constructor.construct(uuidString);
-    }
-
-    /**
-     * UUIDのコンストラクタを取得する
-     *
-     * @param uuidType UUID種別
-     * @return UUIDのコンストラクタ。モックが設定されている場合、モックを返却
-     * @exception IllegalArgumentException UUID種別がサポートされていない場合
-     */
-    private static IConstructor getConstructor(Uuid.Type uuidType) {
-        System.Type constructorClass = CONSTRUCTOR_CLASS_BY_VARIANT.get(uuidType);
-        if (constructorClass == null)
-            throw new IllegalArgumentException('uuidType (' + uuidType?.name() + ') がサポートされていません。');
-
-        return (IConstructor) constructorClass.newInstance();
-    }
-
-    /**
-     * UUIDの文字列を取得する
-     *
-     * @return UUIDの文字列
-     */
-    public String stringValue() {
-        return this.value;
-    }
-
-    /**
-     * UUIDを生成する
-     *
-     * @return 生成されたUUID
-     */
-    private abstract String generateUuid();
-
-    /**
-     * UUIDが有効な形式であることを検証する
-     *
-     * @param uuidString UUID
-     * @return 有効である場合はtrue、それ以外の場合はfalse
-     */
-    private abstract Boolean isValid(String uuidString);
-
-    /**
-     * UUIDコンストラクタ
-     */
-    public interface IConstructor {
-        /**
-         * UUIDをインスタンス化する
-         *
-         * @return UUIDのインスタンス
-         */
-        Uuid construct();
-
-        /**
-         * UUIDをインスタンス化する
-         *
-         * @param uuidString UUIDの文字列
-         * @return UUIDのインスタンス
-         */
-        Uuid construct(String uuidString);
+    public override String toString() {
+        return this.uuidString;
     }
 }

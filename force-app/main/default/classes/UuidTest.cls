@@ -3,86 +3,59 @@
  */
 @IsTest(IsParallel=true)
 private class UuidTest {
+    private static final String UUID_V4_FORMAT_REGEX = '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89ab]{1}[0-9a-fA-F]{3}-[0-9a-fA-F]{12}';
+
     @IsTest
-    static void constructor_When_CallDefaultConstructor_Expect_GenerateUuid() {
+    static void fromString_When_ArgumentIsValid_Expect_ReturnUuid() {
         // 準備
-        UuidMock.generatedUuid = 'This is UUID';
+        String uuidString = '564f6370-b9ea-404a-8c04-b9bc508e8d7d';
 
         // 実行
-        Uuid uuid = new UuidMock();
+        Uuid uuid = Uuid.fromString(uuidString);
 
         // 検証
-        Assert.areEqual(UuidMock.generatedUuid, uuid.stringValue());
+        Assert.areEqual(uuidString, uuid.toString());
     }
 
     @IsTest
-    static void constructor_When_UuidStringIsValid_Expect_ConstructByUuidString() {
+    static void fromString_When_ArgumentIsTooLong_Expect_ThrowException() {
         // 準備
-        UuidMock.isValid = true;
-        String uuidString = 'This is valid UUID';
-
-        // 実行
-        Uuid uuid = new UuidMock(uuidString);
-
-        // 検証
-        Assert.areEqual(uuidString, uuid.stringValue());
-    }
-
-    @IsTest
-    static void constructor_When_UuidStringIsInvalid_Expect_ThrowException() {
-        // 準備
-        UuidMock.isValid = false;
+        String uuidString = '564f6370-b9ea-404a-8c04-b9bc508e8d7daaaaaaaaaaaaa';
 
         // 実行 & 検証
         try {
-            Uuid uuid = new UuidMock('This is invalid UUID');
+            Uuid uuid = Uuid.fromString(uuidString);
             Assert.fail();
         } catch (IllegalArgumentException e) {
-            Assert.areEqual('uuidString (This is invalid UUID) が無効な形式です。', e.getMessage());
+            Assert.areEqual('UUID文字列が長すぎます。上限は36文字です。: ' + uuidString, e.getMessage());
         }
     }
 
     @IsTest
-    static void newInstance_When_TypeIsSupported_Expect_ReturnUuid() {
+    static void fromString_When_ArgumentIsInvalid_Expect_ThrowException() {
         // 準備
-        Uuid.CONSTRUCTOR_CLASS_BY_VARIANT.clear();
-        Uuid.CONSTRUCTOR_CLASS_BY_VARIANT.put(null, UuidMock.Constructor.class);
-        Uuid.Type uuidType = null;
-
-        // 実行
-        Uuid uuid = Uuid.newInstance(uuidType);
-
-        // 検証
-        Assert.isInstanceOfType(uuid, UuidMock.class);
-    }
-
-    @IsTest
-    static void newInstance_When_TypeIsUnsupported_Expect_ThrowException() {
-        // 準備
-        Uuid.CONSTRUCTOR_CLASS_BY_VARIANT.clear();
-        Uuid.Type uuidType = null;
+        String uuidString = 'This is invalid';
 
         // 実行 & 検証
         try {
-            Uuid uuid = Uuid.newInstance(uuidType);
+            Uuid uuid = Uuid.fromString(uuidString);
             Assert.fail();
         } catch (IllegalArgumentException e) {
-            Assert.areEqual('uuidType (' + uuidType?.name() + ') がサポートされていません。', e.getMessage());
+            Assert.areEqual('UUID文字列が無効な形式です。: ' + uuidString, e.getMessage());
         }
     }
 
     @IsTest
-    static void newInstance_When_CallWithUuidString_Expect_ReturnUuidHasUuidString() {
+    static void randomUuid_When_Call_Expect_ReturnUuid() {
         // 準備
-        Uuid.CONSTRUCTOR_CLASS_BY_VARIANT.clear();
-        Uuid.CONSTRUCTOR_CLASS_BY_VARIANT.put(null, UuidMock.Constructor.class);
-        Uuid.Type uuidType = null;
-        String uuidString = 'test';
+        // なし
 
         // 実行
-        Uuid uuid = Uuid.newInstance(uuidType, uuidString);
+        Uuid uuid = Uuid.randomUuid();
 
         // 検証
-        Assert.areEqual(uuidString, uuid.stringValue());
+        Pattern uuidV4Pattern = Pattern.compile(UUID_V4_FORMAT_REGEX);
+        Matcher uuidV4Matcher = uuidV4Pattern.matcher(uuid.toString());
+        Assert.isTrue(uuidV4Matcher.matches());
     }
 }

@@ -4,27 +4,23 @@
 
 ## 使用方法
 
-- UUID を生成する
-
-    - RFC4122 規格バージョン4
-
-        ```java
-        Uuid uuid = Uuid.newInstance(Uuid.Type.RFC4122_V4);
-        ```
-
-- 文字列を取得する
+- 乱数に基づく UUID（UUID バージョン4）を生成する
 
     ```java
-    Uuid uuid = Uuid.newInstance(Uuid.Type.RFC4122_V4);
-    String uuidString = uuid.stringValue();
+    Uuid uuid = Uuid.randomUuid();
     ```
 
-- 既存の UUID 文字列を使用してインスタンス化する
+- UUID の文字列表現を取得する
 
     ```java
-    String uuidString = '564f6370-b9ea-404a-8c04-b9bc508e8d7d';
-    Uuid uuid = Uuid.newInstance(Uuid.Type.RFC4122_V4, uuidString);
-    Assert.areEqual(uuidString, uuid.stringValue());
+    Uuid uuid = Uuid.randomUuid();
+    String uuidString = uuid.toString();
+    ```
+
+- 文字列表現から UUID を生成する
+
+    ```java
+    Uuid uuid = Uuid.fromString('564f6370-b9ea-404a-8c04-b9bc508e8d7d');
     ```
 
 ## インストール方法
