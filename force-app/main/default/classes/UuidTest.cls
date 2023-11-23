@@ -3,7 +3,7 @@
  */
 @IsTest(IsParallel=true)
 private class UuidTest {
-    private static final String UUID_V4_FORMAT_REGEX = '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89ab]{1}[0-9a-fA-F]{3}-[0-9a-fA-F]{12}';
+    private static final String UUID_V4_FORMAT_REGEX = '[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab]{1}[0-9a-f]{3}-[0-9a-f]{12}';
 
     @IsTest
     static void fromString_When_ArgumentIsValid_Expect_ReturnUuid() {
@@ -57,5 +57,177 @@ private class UuidTest {
         Pattern uuidV4Pattern = Pattern.compile(UUID_V4_FORMAT_REGEX);
         Matcher uuidV4Matcher = uuidV4Pattern.matcher(uuid.toString());
         Assert.isTrue(uuidV4Matcher.matches());
+    }
+
+    @IsTest
+    static void hexToInt_When_ArgumentIsPositive_Expect_ReturnInteger() {
+        // 準備
+        String hex = 'ff';
+
+        // 実行
+        Integer intValue = Uuid.hexToInt(hex);
+
+        // 検証
+        Assert.areEqual(255, intValue);
+    }
+
+    @IsTest
+    static void hexToInt_When_ArgumentIsNegative_Expect_ReturnInteger() {
+        // 準備
+        String hex = '-ff';
+
+        // 実行
+        Integer intValue = Uuid.hexToInt(hex);
+
+        // 検証
+        Assert.areEqual(-255, intValue);
+    }
+
+    @IsTest
+    static void hexToInt_When_ArgumentIsZero_Expect_ReturnInteger() {
+        // 準備
+        String hex = '0';
+
+        // 実行
+        Integer intValue = Uuid.hexToInt(hex);
+
+        // 検証
+        Assert.areEqual(0, intValue);
+    }
+
+    @IsTest
+    static void hexToInt_When_ArgumentIsNull_Expect_ThrowException() {
+        // 準備
+        String hex = null;
+
+        // 実行 & 検証
+        try {
+            Uuid.hexToInt(hex);
+            Assert.fail();
+        } catch (IllegalArgumentException e) {
+            Assert.areEqual('hex が null です。', e.getMessage());
+        }
+    }
+
+    @IsTest
+    static void hexToInt_When_ArgumentIsEmptyString_Expect_ThrowException() {
+        // 準備
+        String hex = '';
+
+        // 実行 & 検証
+        try {
+            Uuid.hexToInt(hex);
+            Assert.fail();
+        } catch (IllegalArgumentException e) {
+            Assert.areEqual('hex (' + hex + ') が無効な形式です。', e.getMessage());
+        }
+    }
+
+    @IsTest
+    static void hexToInt_When_ArgumentIsPlusOnly_Expect_ThrowException() {
+        // 準備
+        String hex = '+';
+
+        // 実行 & 検証
+        try {
+            Uuid.hexToInt(hex);
+            Assert.fail();
+        } catch (IllegalArgumentException e) {
+            Assert.areEqual('hex (' + hex + ') が無効な形式です。', e.getMessage());
+        }
+    }
+
+    @IsTest
+    static void hexToInt_When_ArgumentIsMinusOnly_Expect_ThrowException() {
+        // 準備
+        String hex = '-';
+
+        // 実行 & 検証
+        try {
+            Uuid.hexToInt(hex);
+            Assert.fail();
+        } catch (IllegalArgumentException e) {
+            Assert.areEqual('hex (' + hex + ') が無効な形式です。', e.getMessage());
+        }
+    }
+
+    @IsTest
+    static void hexToInt_When_ArgumentIsInvalidFormat_Expect_ThrowException() {
+        // 準備
+        String hex = ' ';
+
+        // 実行 & 検証
+        try {
+            Uuid.hexToInt(hex);
+            Assert.fail();
+        } catch (IllegalArgumentException e) {
+            Assert.areEqual('hex (' + hex + ') が無効な形式です。', e.getMessage());
+        }
+    }
+
+    @IsTest
+    static void hexToInt_When_ArgumentIsInvalidFormat2_Expect_ThrowException() {
+        // 準備
+        String hex = 'zzz';
+
+        // 実行 & 検証
+        try {
+            Uuid.hexToInt(hex);
+            Assert.fail();
+        } catch (IllegalArgumentException e) {
+            Assert.areEqual('hex (' + hex + ') が無効な形式です。', e.getMessage());
+        }
+    }
+
+    @IsTest
+    static void intToHex_When_ArgumentIsPositive_Expect_ReturnHexString() {
+        // 準備
+        Integer intValue = 255;
+
+        // 実行
+        String hex = Uuid.intToHex(intValue);
+
+        // 検証
+        Assert.areEqual('ff', hex);
+    }
+
+    @IsTest
+    static void intToHex_When_ArgumentIsZero_Expect_ReturnHexString() {
+        // 準備
+        Integer intValue = 0;
+
+        // 実行
+        String hex = Uuid.intToHex(intValue);
+
+        // 検証
+        Assert.areEqual('0', hex);
+    }
+
+    @IsTest
+    static void intToHex_When_ArgumentIsNegetive_Expect_ThrowException() {
+        // 準備
+        Integer intValue = -255;
+
+        // 実行 & 検証
+        try {
+            Uuid.intToHex(intValue);
+            Assert.fail();
+        } catch (IllegalArgumentException e) {
+            Assert.areEqual('i (' + intValue + ') が負の値です。負の値はサポートされていません。', e.getMessage());
+        }
+    }
+
+    @IsTest
+    static void intToHex_When_ArgumentIsNull_Expect_ThrowException() {
+        // 準備
+        Integer intValue = null;
+
+        // 実行 & 検証
+        try {
+            Uuid.intToHex(intValue);
+            Assert.fail();
+        } catch (IllegalArgumentException e) {
+            Assert.areEqual('i が null です。', e.getMessage());
+        }
     }
 }

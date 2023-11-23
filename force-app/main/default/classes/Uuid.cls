@@ -3,6 +3,19 @@
  */
 public class Uuid {
     /**
+     * 16進数の基数
+     */
+    private static final Integer HEX_RADIX = 16;
+
+    /**
+     * 16進数で使用される文字
+     */
+    private static final List<String> HEX_CHARS = new List<String>{
+        '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+        'a', 'b', 'c', 'd', 'e', 'f'
+    };
+
+    /**
      * UUIDの文字列表現
      */
     private final String uuidString;
@@ -58,13 +71,13 @@ public class Uuid {
 
         // バリアントを用意
         String variantHex = randomHex.substring(16, 17); // 16進数の17桁目（バリアントを表す桁）を取得
-        Integer variantInt = IntegerUtils.fromHexString(variantHex); // 10進数に変換
+        Integer variantInt = hexToInt(variantHex); // 10進数に変換
         variantInt = variantInt | 8; // 1ビット目を1にする
         variantInt = variantInt & 11; // 2ビット目を0にする
-        variantHex = IntegerUtils.toHexString(variantInt); // 16進数に変換
+        variantHex = intToHex(variantInt); // 16進数に変換
 
         // バージョンを用意
-        String versionHex = IntegerUtils.toHexString(4);
+        String versionHex = intToHex(4);
 
         // UUIDを生成
         String uuidString = String.format('{0}-{1}-{2}-{3}-{4}', new List<String>{
@@ -76,6 +89,90 @@ public class Uuid {
         });
 
         return new Uuid(uuidString);
+    }
+
+    /**
+     * 16進数を10進数に変換する
+     *
+     * @param hex 16進数の文字列表現
+     * @return 10進数の整数
+     * @exception IllegalArgumentException hex が null または無効な形式の場合
+     */
+    @TestVisible
+    private static Integer hexToInt(String hex) {
+        if (hex == null) {
+            throw new IllegalArgumentException('hex が null です。');
+        }
+
+        Boolean isNegative = false;
+        Integer i = 0;
+        Integer len = hex.length();
+
+        if (len > 0) {
+            String firstChar = hex.substring(0, 1);
+            if (firstChar < '0') { // 先頭に「+」または「-」を付けることができる
+                if (firstChar == '-') {
+                    isNegative = true;
+                } else if (firstChar != '+') {
+                    throw new IllegalArgumentException('hex (' + hex + ') が無効な形式です。');
+                }
+
+                if (len == 1) { // 単独の「+」または「-」のみは使用できない
+                    throw new IllegalArgumentException('hex (' + hex + ') が無効な形式です。');
+                }
+                i++;
+            }
+
+            Integer intValue = 0;
+            while (i < len) {
+                String hex1Digit = hex.substring(i, i + 1);
+                Integer intOfHex1Digit = HEX_CHARS.indexOf(hex1Digit);
+
+                if (intOfHex1Digit == -1) {
+                    throw new IllegalArgumentException('hex (' + hex + ') が無効な形式です。');
+                }
+
+                intValue *= HEX_RADIX;
+                intValue += intOfHex1Digit;
+                i++;
+            }
+            return isNegative ? -intValue : intValue;
+        } else {
+            throw new IllegalArgumentException('hex (' + hex + ') が無効な形式です。');
+        }
+    }
+
+    /**
+     * 10進数を16進数に変換する
+     *
+     * @param i 16進数に変換する10進数の整数
+     * @return 16進数の文字列表現
+     * @exception IllegalArgumentException i が null または負の値である場合
+     */
+    @TestVisible
+    private static String intToHex(Integer i) {
+        if (i == null) {
+            throw new IllegalArgumentException('i が null です。');
+        }
+
+        if (i == 0) {
+            return '0';
+        } else if (i < 0) {
+            // TODO: 負の値の場合、2の補数で表す（全ビット反転 + 1）
+            // 現在はサポートされていないためエラーとする
+            throw new IllegalArgumentException('i (' + i + ') が負の値です。負の値はサポートされていません。');
+        }
+
+        // 10進数の右側から1桁ずつ16進数に変換する
+        String hex = '';
+        while (i > 0) {
+            Integer intOf1Digit = Math.mod(i, HEX_RADIX);
+            String hexOf1Digit = HEX_CHARS[intOf1Digit];
+            hex = hexOf1Digit + hex;
+            i = i / HEX_RADIX;
+        }
+
+        return hex;
     }
 
     /**
