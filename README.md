@@ -3,8 +3,7 @@
 このリポジトリには、UUID を生成する Apex クラスが含まれています。UUID については [Wikipedia](https://ja.wikipedia.org/wiki/UUID) を参照してください。
 
 > [!NOTE]
-> Spring '24 リリースにより、[組み込みのUUIDクラス](https://help.salesforce.com/s/articleView?id=release-notes.rn_apex_uuid.htm&language=ja&release=248&type=5)が追加されました。
-> このリポジトリのUuidクラスを使用しなくとも、組み込みのUUIDクラスを使用することができます。
+> Spring '24 リリースにより、[組み込みのUUIDクラス](https://help.salesforce.com/s/articleView?id=release-notes.rn_apex_uuid.htm&language=ja&release=248&type=5)が追加されました。このリポジトリのUuidクラスを使用しなくとも、組み込みのUUIDクラスを使用することができます。
 
 ## 使用方法
 
